@@ -1,0 +1,120 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+
+comments:
+  active: true
+  UndocumentedPublicClass:
+    active: false # doc comments are enforced by convention/PR review in this codebase (see docs/CONTRIBUTING.md), not mechanically
+  UndocumentedPublicFunction:
+    active: false
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 10 # domain models like Machinery/Labor legitimately have many fields per the original spec's field lists
+  ComplexMethod:
+    active: true
+    threshold: 15
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 20
+  NestedBlockDepth:
+    active: true
+    threshold: 4
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: true # every coroutine must be scoped (ViewModelScope, repository-injected scope) — no fire-and-forget GlobalScope calls anywhere, since this app has no backend to silently retry a lost operation
+  SuspendFunWithFlowReturnType:
+    active: true
+
+empty-blocks:
+  active: true
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - ArrayIndexOutOfBoundsException
+      - Error
+      - Exception
+      - IllegalMonitorStateException
+      - NullPointerException
+      - IndexOutOfBoundsException
+      - RuntimeException
+      - Throwable
+  SwallowedException:
+    active: true # a caught financial-calculation exception must never be silently discarded — this is the mechanical enforcement behind "AI can never change financial calculations" failing loudly rather than silently if something goes wrong upstream
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+  VariableNaming:
+    active: true
+  ClassNaming:
+    active: true
+
+performance:
+  active: true
+
+potential-bugs:
+  active: true
+  EqualsAlwaysReturnsTrueOrFalse:
+    active: true
+  EqualsWithHashCodeExist:
+    active: true
+  UnconditionalJumpStatementInLoop:
+    active: true
+  UnreachableCode:
+    active: true
+  UnsafeCallOnNullableType:
+    active: true # explicit `!!` calls are exactly the kind of thing that must not slip into financial-calculation code paths unreviewed
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    excludes: ['**/test/**', '**/androidTest/**']
+    ignoreNumbers: ['-1', '0', '1', '2', '100'] # 100 allowed for percentage math (already pervasive and self-explanatory across the financial/BOM engines), but any other bare literal in calculation code must be a named constant
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  ReturnCount:
+    active: true
+    max: 4
+  WildcardImport:
+    active: true
+  ForbiddenComment:
+    active: false # TODO/FIXME comments are fine mid-development; tracked via issues at release time instead, not blocked at every commit
+  UnusedPrivateMember:
+    active: true
+  UnnecessaryAbstractClass:
+    active: true
+
+libraries-detekt:
+  active: false
